@@ -1,0 +1,22 @@
+services:
+
+  mysql:
+    build: ./mysql/
+    container_name: mysql
+    restart: always
+
+    environment:
+      MYSQL_ROOT_PASSWORD: "12345"
+      MYSQL_DATABASE: "app"
+      MYSQL_USER: "admin"
+      MYSQL_PASSWORD: "12345"
+      MYSQL_PORT: 3306
+
+    ports:
+      - "3306:3306"
+
+    volumes:
+      - mysql_data:/var/lib/mysql
+volumes:
+  mysql_data:
+    name: mysql_data

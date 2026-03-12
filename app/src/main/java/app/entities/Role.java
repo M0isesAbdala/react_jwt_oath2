@@ -5,21 +5,36 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Data
 @NoArgsConstructor
-@AllArgsConstructor
-@Builder
 public class Role {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "role_id")
-    private Long roleId;
-    private String name;
+    private Long id;
+    @Enumerated(EnumType.STRING)
+    private Roles name;
+
+    public Role(Role.Roles role) {
+        this.id = role.getRoleId();
+        this.name = role;
+    }
+
+    public Roles getName() {
+        return name;
+    }
+
+    public void setName(Roles name) {
+        this.name = name;
+        this.id = name.getRoleId();
+    }
+
+    public Long getId() {
+        return id;
+    }
 
     @JsonValue
     public String jsonValue() {
-        return name;
+        return name.name();
     }
 
     @Getter
@@ -33,5 +48,6 @@ public class Role {
         Roles(long roleId) {
             this.roleId = roleId;
         }
+
     }
 }

@@ -1,22 +1,25 @@
 package app.controllers;
 
-import app.dto.CreateUser;
-import app.dto.Users;
+import app.dto.DTOCreateUser;
+import app.dto.DTOUser;
+import app.dto.DTOUsers;
 import app.entities.Role;
 import app.entities.User;
 import app.repository.RoleRepository;
 import app.repository.UserRepository;
 import jakarta.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.server.ResponseStatusException;
 import tools.jackson.databind.ObjectMapper;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 @RestController
@@ -37,9 +40,9 @@ public class UserController {
 
     @Transactional
     @PostMapping
-    public ResponseEntity<Void> newUser(@RequestBody CreateUser dto) {
+    public ResponseEntity<Void> newUser(@RequestBody DTOCreateUser dto) {
 
-        var basicRole = roleRepository.findByName(Role.Roles.USER.name());
+        var basicRole = roleRepository.findByName(Role.Roles.USER);
 
         var userFromDb = userRepository.findByUsername(dto.username());
         if (userFromDb.isPresent()) {
@@ -53,18 +56,48 @@ public class UserController {
 
         userRepository.save(user);
 
-        return ResponseEntity.ok().build();
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @GetMapping
     @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
-    public ResponseEntity<List<Users>> listUsers() {
+    public ResponseEntity<List<DTOUsers>> listUsers() {
         var users = userRepository.findAll();
 
-        List<Users> usersDto = mapper.convertValue(users,
-                mapper.getTypeFactory().constructCollectionType(List.class, Users.class)
+        List<DTOUsers> DTOUsers = mapper.convertValue(users,
+                mapper.getTypeFactory().constructCollectionType(List.class, DTOUsers.class)
         );
 
-        return ResponseEntity.ok(usersDto);
+        return ResponseEntity.ok(DTOUsers);
+    }
+
+    @GetMapping(path = "{id}")
+    @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
+    public ResponseEntity<DTOUser> user(@PathVariable Long id) {
+        Optional<User> user = userRepository.findById(id);
+
+        if(user.isPresent()){
+            var dtoUser = mapper.convertValue(user, DTOUser.class);
+            return ResponseEntity.ok(dtoUser);
+        }
+
+        return ResponseEntity.notFound().build();
+    }
+
+    @DeleteMapping(path = "{id}")
+    @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
+    public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
+
+        Optional<User> user = userRepository.findById(id);
+        if(user.isPresent()){
+            System.out.println(user.get().getRoles());
+            if(user.get().getRoles().stream().allMatch((r) -> r.getName().equals("ADMIN"))){
+                return ResponseEntity.status(403).build();
+            }
+            userRepository.delete(user.get());
+            return ResponseEntity.ok().build();
+        }
+
+       return ResponseEntity.notFound().build();
     }
 }

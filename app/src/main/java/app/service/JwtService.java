@@ -1,67 +1,42 @@
 package app.service;
 
-import io.jsonwebtoken.*;
-import io.jsonwebtoken.io.Decoders;
-import io.jsonwebtoken.security.Keys;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
+import app.dto.DTOLoginResponse;
+import app.entities.User;
+import org.springframework.security.oauth2.jwt.JwtClaimsSet;
+import org.springframework.security.oauth2.jwt.JwtEncoder;
+import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.stereotype.Service;
-import app.dto.JwtUsernameAndRoles;
 
-import javax.crypto.SecretKey;
-import java.util.Date;
-import java.util.List;
+import java.time.Instant;
+import java.util.stream.Collectors;
 
 @Service
 public class JwtService {
 
-    @Value("${jwt.secret}")
-    private String secret;
+    private final JwtEncoder jwtEncoder;
 
-    @Value("${jwt.expiration}")
-    private long expiration;
-
-    private SecretKey getKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(secret);
-        return Keys.hmacShaKeyFor(keyBytes);
+    public JwtService(JwtEncoder jwtEncoder) {
+        this.jwtEncoder = jwtEncoder;
     }
 
-    public String generateToken(UserDetails userDetails) {
+    public DTOLoginResponse generateToken(User user){
+        var now = Instant.now();
+        var expiresIn = 300L;
 
-        List<String> roles = userDetails.getAuthorities()
+        var scopes = user.getRoles()
                 .stream()
-                .map(GrantedAuthority::getAuthority)
-                .toList();
+                .map((r) -> r.getName().name())
+                .collect(Collectors.joining(" "));
 
+        var claims = JwtClaimsSet.builder()
+                .issuer("app")
+                .subject(user.getId().toString())
+                .issuedAt(now)
+                .expiresAt(now.plusSeconds(expiresIn))
+                .claim("scope", scopes)
+                .build();
 
-        return Jwts.builder()
-                .setSubject(userDetails.getUsername())
-                .claim("roles", roles)
-                .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + expiration))
-                .signWith(getKey())
-                .compact();
-    }
-
-    public JwtUsernameAndRoles extractUsernameAndRoles(String token) {
-
-        Jwts.parser()
-                .verifyWith(this.getKey())
-                .build()
-                .parseSignedClaims(token)
-                .getPayload()
-                .getSubject();
-
-        Claims claims = Jwts
-                .parser()
-                .verifyWith(getKey())
-                .build()
-                .parseSignedClaims(token)
-                .getPayload();
-
-
-        return new JwtUsernameAndRoles(claims.getSubject(), claims.get("roles", List.class));
+        return new DTOLoginResponse(jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue(), expiresIn);
     }
 
 }

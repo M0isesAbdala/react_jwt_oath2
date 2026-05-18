@@ -1,22 +1,115 @@
 services:
-
   mysql:
     build: ./mysql/
-    container_name: mysql
+    container_name: ${MYSQL_URL}
     restart: always
 
-    environment:
-      MYSQL_ROOT_PASSWORD: "12345"
-      MYSQL_DATABASE: "app"
-      MYSQL_USER: "admin"
-      MYSQL_PASSWORD: "12345"
-      MYSQL_PORT: 3306
+    env_file:
+      - .env
 
     ports:
-      - "3306:3306"
+      - "3306:${MYSQL_PORT}"
 
     volumes:
       - mysql_data:/var/lib/mysql
+
+    networks:
+      - default_network
+  nginx:
+    build: ./nginx/
+    container_name: nginx
+    restart: always
+
+    env_file:
+      - .env
+
+    ports:
+      - "80:80"
+
+    networks:
+      - default_network
+  # discovery-service:
+  #   build: ./discoveryService/
+  #   container_name: ${DISCOVERY_SERVICE_NAME}
+
+  #   env_file:
+  #     - .env
+
+  #   ports:
+  #     - "9090:${DISCOVERY_SERVICE_PORT}"
+
+  #   networks:
+  #     - default_network
+  # gateway:
+  #   build: ./gateway/
+  #   container_name: ${GATEWAY_NAME}
+
+  #   depends_on:
+  #     - discovery-service
+
+  #   env_file:
+  #     - .env
+
+  #   ports:
+  #     - "${GATEWAY_PORT}:${GATEWAY_PORT}"
+
+  #   networks:
+  #     - default_network
+  # authentication:
+  #   build: ./authentication/
+  #   container_name: ${AUTHENTICATION_NAME}
+
+  #   depends_on:
+  #     - mysql
+
+  #   env_file:
+  #     - .env
+
+  #   ports:
+  #     - "9000:${AUTHENTICATION_PORT}"
+
+  #   networks:
+  #     - default_network
+  # resource:
+  #   build: ./resource/
+  #   container_name: ${RESOURCE_PORT_NAME}
+
+  #   depends_on:
+  #     - mysql
+  #     - authentication
+  #     - discovery-service
+
+  #   env_file:
+  #     - .env
+
+  #   ports:
+  #     - "0:${RESOURCE_PORT}"
+
+  #   networks:
+  #     - default_network
+  # client:
+  #   build: ./client/
+  #   container_name: client
+
+  #   depends_on:
+  #     - mysql
+  #     - authentication
+  #     - discovery-service
+
+  #   env_file:
+  #     - .env
+
+  #   ports:
+  #     - "${CLIENT_PORT}:${CLIENT_PORT}"
+
+  #   networks:
+  #     - default_network
 volumes:
   mysql_data:
     name: mysql_data
+  front_end:
+    name: front_end
+
+networks:
+  default_network:
+    driver: bridge

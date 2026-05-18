@@ -1,0 +1,32 @@
+{
+    "title": "Users",
+    "newUserButton": "New user",
+    "editUserButton": "Edit user",
+    "deleteUserButton": "Deletar usuário",
+    "loadingMessage": "Delete user",
+    "loadingButton": "Refresh",
+    "registerUser": "Register user",
+    "registerUserRoles": "Roles",
+    "backRegisterUser": "Back",
+    "saveUser": "Salvar usuário",
+    "userNameField": "Username",
+    "userEmailField": "E-mail",
+    "passwordField": "Password",
+    "repeatPasswordField": "Repeat Password",
+    "sucessSaveMessage": "User saved successfully!",
+    "differentPasswordsErrorMessage": "Passwords are different!",
+    "headers": {
+        "id": "ID",
+        "username": "Name",
+        "email": "E-mail"
+    },
+    "errors": {
+        "0": "Problem saving the user!",
+        "1": "Email already registered!",
+        "2": "User not found!"
+    },
+    "delete": {
+        "success": "User successfully deleted!",
+        "error": "Problem deleting user!"
+    }
+}

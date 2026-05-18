@@ -1,0 +1,55 @@
+logging:
+  level:
+    org.springframework.web: ${DEBUG_LOG_LEVEL}
+    org.springframework.security: ${DEBUG_LOG_LEVEL}
+    org.springframework.security.web.FilterChainProxy: ${DEBUG_LOG_LEVEL}
+    org.springframework.security.oauth2: ${DEBUG_LOG_LEVEL}
+    org.springframework.security.oauth2.client: ${DEBUG_LOG_LEVEL}
+    org.springframework.security.oauth2.core.endpoint: ${DEBUG_LOG_LEVEL}
+    org.springframework.security.oauth2.client.endpoint: ${DEBUG_LOG_LEVEL}
+#    com.netflix.eureka: ${DEBUG_LOG_LEVEL}
+#    com.netflix.discovery: ${DEBUG_LOG_LEVEL}
+#    org.springframework.cloud.netflix.eureka: ${DEBUG_LOG_LEVEL}
+#    com.netflix.discovery.shared.MonitoredConnectionManager: ${DEBUG_LOG_LEVEL}
+server:
+  forward-headers-strategy: native
+  port: ${AUTHENTICATION_PORT}
+  servlet:
+    context-path: /${AUTHENTICATION_NAME}
+    session:
+      cookie:
+        path: /${AUTHENTICATION_NAME}
+        name: AUTHSESSION
+spring:
+  security:
+    oauth2:
+      authorizationserver:
+        issuer: http://mysite.com/authentication
+  application:
+    name: ${AUTHENTICATION_NAME}
+  sql:
+    init:
+      mode: always
+  datasource:
+    url: jdbc:mysql://${MYSQL_URL}:${MYSQL_PORT}/${MYSQL_DATABASE}
+    username: ${MYSQL_USER}
+    password: ${MYSQL_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    defer-datasource-initialization: true
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    database: MYSQL
+jwt:
+  private:
+    key: classpath:keys/private.pem
+  public:
+    key: classpath:keys/public.pem
+eureka:
+  client:
+    registry-fetch-interval-seconds: 5
+    serviceUrl:
+      defaultZone: ${DISCOVERY_SERVICE_URL}:${DISCOVERY_SERVICE_PORT}/eureka/
+  instance:
+    instanceId: ${spring.application.name}:${instanceId:${random.value}}

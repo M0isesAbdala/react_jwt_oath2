@@ -1,0 +1,53 @@
+logging:
+  level:
+    org.springframework.web: ${DEBUG_LOG_LEVEL}
+    org.springframework.security: ${DEBUG_LOG_LEVEL}
+    org.springframework.security.web.FilterChainProxy: ${DEBUG_LOG_LEVEL}
+    org.springframework.security.oauth2: ${DEBUG_LOG_LEVEL}
+    org.springframework.security.oauth2.client: ${DEBUG_LOG_LEVEL}
+    org.springframework.security.oauth2.core.endpoint: ${DEBUG_LOG_LEVEL}
+    org.springframework.security.oauth2.client.endpoint: ${DEBUG_LOG_LEVEL}
+    com.netflix.eureka: ${DEBUG_LOG_LEVEL}
+    com.netflix.discovery: ${DEBUG_LOG_LEVEL}
+    org.springframework.cloud.netflix.eureka: ${DEBUG_LOG_LEVEL}
+    com.netflix.discovery.shared.MonitoredConnectionManager: ${DEBUG_LOG_LEVEL}
+server:
+  port: ${CLIENT_PORT}
+  forward-headers-strategy: framework
+  servlet:
+    context-path: /${CLIENT_NAME}
+    session:
+      timeout: 30m
+      cookie:
+        path: /
+        name: CLIENTSESSION
+spring:
+  application:
+    name: ${CLIENT_NAME}
+  security:
+    oauth2:
+      client:
+        registration:
+          web-client-oidc:
+            provider: auth-server
+            client-id: web-client
+            client-secret: 123456
+            authorization-grant-type: authorization_code
+            client-authentication-method: client_secret_basic
+            redirect-uri: http://mysite.com/client/login/oauth2/code/{registrationId}
+            scope: openid,profile
+        provider:
+          auth-server:
+            issuer-uri: http://mysite.com/authentication
+            authorization-uri: http://mysite.com/authentication/oauth2/authorize
+            token-uri: http://mysite.com/authentication/oauth2/token
+            jwk-set-uri: http://mysite.com/authentication/oauth2/jwks
+            user-info-uri: http://mysite.com/authentication/userinfo
+            user-name-attribute: sub
+eureka:
+  client:
+    registry-fetch-interval-seconds: 5
+    serviceUrl:
+      defaultZone: ${DISCOVERY_SERVICE_URL}:${DISCOVERY_SERVICE_PORT}/eureka/
+  instance:
+    instanceId: ${spring.application.name}:${instanceId:${random.value}}

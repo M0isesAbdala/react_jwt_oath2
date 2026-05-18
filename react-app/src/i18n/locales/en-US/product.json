@@ -1,0 +1,31 @@
+{
+    "title": "Products",
+    "newProductButton": "New product",
+    "editProductButton": "Edit product",
+    "deleteProductButton": "Delete product",
+    "loadingMessage": "Loading information",
+    "loadingButton": "Refresh",
+    "registerProduct": "Register Product",
+    "backRegisterProduct": "Back",
+    "saveProduto": "Save Product",
+    "productNameField": "Product name",
+    "productPriceField": "Price",
+    "productBarcodeField": "Bar code",
+    "sucessSaveMessage": "Product saved successfully!",
+    "headers": {
+        "id": "ID",
+        "name": "Name",
+        "price": "Price",
+        "barcode": "Barcode"
+    },
+    "errors": {
+        "0": "Problem saving product!",
+        "1": "Conflict between product fields!",
+        "2": "Product not found!!",
+        "3": "The fields are not valid!"
+    },
+    "delete": {
+        "success": "Product successfully deleted!",
+        "error": "Problem deleting product!"
+    }
+}

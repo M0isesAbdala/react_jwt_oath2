@@ -35,17 +35,12 @@ public class SessionOAuth2AuthorizedClientRepository implements OAuth2Authorized
         session.setAttribute(registrationId, authorizedClient);
         String token = authorizedClient.getAccessToken().getTokenValue();
         session.setAttribute("token", token);
-        System.out.println("TOKEN: " + authorizedClient.getAccessToken().getTokenValue());
-        authorizedClient.getAccessToken().getScopes().forEach(System.out::println);
-        principal.getAuthorities().forEach(System.out::println);
 
         try {
             SignedJWT jwt = SignedJWT.parse(token);
             JWTClaimsSet claims = jwt.getJWTClaimsSet();
             List<String> scopes =(List<String>) claims.getClaim("roles");
             session.setAttribute("roles", scopes);
-
-            scopes.forEach(System.out::println);
 
             Authentication authentication = new UsernamePasswordAuthenticationToken(
                     principal.getName(),

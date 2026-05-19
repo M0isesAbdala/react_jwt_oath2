@@ -39,20 +39,20 @@ export default function AuthProvider({ children }: AuthContextProps) {
     const [type, setType] = useState<AuthType>("NONE");
     const [roles, setRoles] = useState<string[]>([]);
 
-    const logoutFallback = (): void => {
+    const closeFallback = (): void => {
         handleCackDrop(false);
+    }
+
+    const logoutFallback = (): void => {
+        closeFallback();
         setType("NONE");
     }
 
     const logout = async (): Promise<void> => {
         if (type === 'PROVIDER') {
-            await handleLogoutPopup().then(() => {
-                logoutFallback();
-            });
+            await handleLogoutPopup().then(logoutFallback).catch(closeFallback);
         } else if (type === 'NORMAL') {
-            await handleLogout().then(() => {
-                logoutFallback();
-            });
+            await handleLogout().then(logoutFallback).catch(closeFallback);
         }
     };
 
@@ -75,7 +75,6 @@ export default function AuthProvider({ children }: AuthContextProps) {
         if (param.type === 'PROVIDER') {
             handleLoginPopup(param.provider, handlePop);
         } else if (param.type === 'NORMAL') {
-            console.log('chamou aqui');
             await handleLogin(param.body).then(() => {
                 setType(param.type);
                 getRoles();
@@ -96,7 +95,7 @@ export default function AuthProvider({ children }: AuthContextProps) {
     };
 
     RegisterAnauthorizedCallback(logoutFallback);
-    console.log('ALTEROU AQUI');
+
     return (
         <AuthContext.Provider value={AUTH_CONTEXT_VALUE}>
             {children}

@@ -1,16 +1,16 @@
-FROM maven:3.9.9-eclipse-temurin-17 AS builder
+FROM eclipse-temurin:17
 
 WORKDIR /app
+
+COPY mvnw .
+COPY .mvn .mvn
+COPY pom.xml .
+
+RUN chmod +x mvnw
+RUN ./mvnw dependency:go-offline
+
 COPY . .
-
-RUN mvn clean package -DskipTests
-
-FROM eclipse-temurin:17-jdk-alpine
-
-WORKDIR /app
-
-COPY --from=builder /app/target/*.jar app.jar
 
 EXPOSE $DISCOVERY_SERVICE_PORT
 
-CMD ["java", "-jar", "app.jar"]
+CMD ["./mvnw", "spring-boot:run"]

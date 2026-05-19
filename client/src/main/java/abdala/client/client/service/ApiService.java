@@ -14,7 +14,7 @@ public class ApiService {
     private final ResourceApi resourceApi;
 
     public ApiService(WebClient webClient, Environment env) {
-        String host = env.getProperty("GATEWAY_URL") + ":" + env.getProperty("GATEWAY_PORT") + "/" + env.getProperty("RESOURCE_NAME");
+        String host = env.getProperty("URL") + "/" + env.getProperty("RESOURCE_NAME");
         productApi = new ProductApi(webClient, host);
         userApi = new UserApi(webClient, host);
         resourceApi = new ResourceApi(webClient, host);

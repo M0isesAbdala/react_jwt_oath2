@@ -43,7 +43,7 @@ export default function Snackbar(): JSX.Element {
     const removeSnack = (id: number) => {
         setSnacks((prev) => prev.filter((s) => s.id !== id));
     };
-    console.log('asudhausdh', snacks);
+
     return (
         <Stack
             spacing={1}

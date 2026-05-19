@@ -17,14 +17,17 @@ services:
       - default_network
   frontend:
     build: ./react-app/
-    container_name: frontend
+    container_name: ${FRONTEND_NAME}
+    restart: always
+
+    env_file:
+      - .env
 
     volumes:
-      # Bind mount only the src folder
       - ./react-app/src:/app/src
 
     ports:
-      - "5173:5173"
+      - "${FRONTEND_PORT}:${FRONTEND_PORT}"
       
     environment:
       CHOKIDAR_USEPOLLING: "true"
@@ -40,86 +43,118 @@ services:
       - .env
 
     ports:
-      - "80:80"
+      - "${NGINX_PORT}:${NGINX_PORT}"
 
     networks:
       - default_network
-  # discovery-service:
-  #   build: ./discoveryService/
-  #   container_name: ${DISCOVERY_SERVICE_NAME}
+  discovery-service:
+    build: ./discoveryService/
+    container_name: ${DISCOVERY_SERVICE_NAME}
+    restart: always
 
-  #   env_file:
-  #     - .env
+    env_file:
+      - .env
 
-  #   ports:
-  #     - "9090:${DISCOVERY_SERVICE_PORT}"
+    ports:
+      - "${DISCOVERY_SERVICE_PORT}:${DISCOVERY_SERVICE_PORT}"
 
-  #   networks:
-  #     - default_network
-  # gateway:
-  #   build: ./gateway/
-  #   container_name: ${GATEWAY_NAME}
+    volumes:
+      - ./discoveryService:/app
 
-  #   depends_on:
-  #     - discovery-service
+    networks:
+      - default_network
+  gateway:
+    build: ./gateway/
+    container_name: ${GATEWAY_NAME}
+    restart: always
 
-  #   env_file:
-  #     - .env
+    depends_on:
+      - discovery-service
 
-  #   ports:
-  #     - "${GATEWAY_PORT}:${GATEWAY_PORT}"
+    env_file:
+      - .env
 
-  #   networks:
-  #     - default_network
-  # authentication:
-  #   build: ./authentication/
-  #   container_name: ${AUTHENTICATION_NAME}
+    ports:
+      - "${GATEWAY_PORT}:${GATEWAY_PORT}"
 
-  #   depends_on:
-  #     - mysql
+    volumes:
+      - ./gateway:/app
 
-  #   env_file:
-  #     - .env
+    networks:
+      - default_network
+  authentication:
+    build: ./authentication/
+    container_name: ${AUTHENTICATION_NAME}
+    restart: always
 
-  #   ports:
-  #     - "9000:${AUTHENTICATION_PORT}"
+    depends_on:
+      - mysql
+      - gateway
+      - discovery-service
 
-  #   networks:
-  #     - default_network
-  # resource:
-  #   build: ./resource/
-  #   container_name: ${RESOURCE_PORT_NAME}
+    env_file:
+      - .env
 
-  #   depends_on:
-  #     - mysql
-  #     - authentication
-  #     - discovery-service
+    ports:
+      - "${AUTHENTICATION_PORT}:${AUTHENTICATION_PORT}"
+    
+    volumes:
+      - ./authentication:/app
 
-  #   env_file:
-  #     - .env
+    networks:
+      - default_network
+  resource:
+    build: ./resource/
+    container_name: ${RESOURCE_NAME}
+    restart: always
 
-  #   ports:
-  #     - "0:${RESOURCE_PORT}"
+    extra_hosts:
+      - "mysite.com:host-gateway"
 
-  #   networks:
-  #     - default_network
-  # client:
-  #   build: ./client/
-  #   container_name: client
+    depends_on:
+      - mysql
+      - nginx
+      - gateway
+      - discovery-service
+      - authentication
 
-  #   depends_on:
-  #     - mysql
-  #     - authentication
-  #     - discovery-service
+    env_file:
+      - .env
 
-  #   env_file:
-  #     - .env
+    ports:
+      - "${RESOURCE_PORT}:${RESOURCE_PORT}"
 
-  #   ports:
-  #     - "${CLIENT_PORT}:${CLIENT_PORT}"
+    volumes:
+      - ./resource:/app
 
-  #   networks:
-  #     - default_network
+    networks:
+      - default_network
+  client:
+    build: ./client/
+    container_name: client
+    restart: always
+
+    extra_hosts:
+      - "mysite.com:host-gateway"
+
+    depends_on:
+      - mysql
+      - nginx
+      - gateway
+      - discovery-service
+      - authentication
+
+    env_file:
+      - .env
+
+    ports:
+      - "${CLIENT_PORT}:${CLIENT_PORT}"
+
+    volumes:
+      - ./client:/app
+
+    networks:
+      - default_network
 volumes:
   mysql_data:
     name: mysql_data

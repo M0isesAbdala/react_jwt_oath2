@@ -6,14 +6,12 @@ logging:
     com.netflix.discovery.shared.MonitoredConnectionManager: TRACE
 server:
   port: ${GATEWAY_PORT}
-#  forward-headers-strategy: framework
 spring:
-#  webflux:
-#    static-path-pattern: "/resources/**"
-#  web:
-#    resources:
-#      static-locations: "classpath:/app/" # Custom directory
-#      add-mappings: true # Ensure static resource handling is enabled
+  devtools:
+    restart:
+      enabled: true
+      poll-interval: 2s
+      quiet-period: 1s
   application:
     name: ${GATEWAY_NAME}
   cloud:
@@ -26,19 +24,6 @@ spring:
               predicates:
                 - Path=/${AUTHENTICATION_NAME}/**
               preserve-host-header: true
-#              filters:
-#                - StripPrefix=1
-#              filters:
-#                - StripPrefix=1
-#              filters:
-#                - name: SetRequestHeader
-#                  args:
-#                    name: X-Forwarded-Host
-#                    value: http://mysite.com
-#                - name: SetRequestHeader
-#                  args:
-#                    name: X-Forwarded-Proto
-#                    value: http
             - id: ${RESOURCE_NAME}
               uri: lb://${RESOURCE_NAME}
               predicates:
@@ -47,11 +32,6 @@ spring:
               uri: lb://${CLIENT_NAME}
               predicates:
                 - Path=/${CLIENT_NAME}/**
-#            - id: spa-fallback
-#              uri: forward:/index.html
-#              predicates:
-#                - Path=/login, /product
-#                - Method=GET
 eureka:
   client:
     registry-fetch-interval-seconds: 5

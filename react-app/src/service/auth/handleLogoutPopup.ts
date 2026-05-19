@@ -13,9 +13,16 @@ export default function handleLogoutPopup(): Promise<void> {
             console.error("Popup bloqueado pelo navegador");
         } else {
 
+            function cleanEvent(): void {
+                if (closeEvent) {
+                    clearInterval(closeEvent);
+                }
+            }
+
             function handleWindowEvent(event: MessageEvent<any>): void {
 
                 function removeEvet(): void {
+                    cleanEvent();
                     window.removeEventListener("message", handleWindowEvent);
                 }
 
@@ -26,16 +33,16 @@ export default function handleLogoutPopup(): Promise<void> {
                     removeEvet()
                     return resolve()
                 }
+
                 removeEvet()
                 return reject();
             }
 
             closeEvent = setInterval(() => {
                 if (POPUP.closed) {
-                    if (closeEvent) {
-                        clearInterval(closeEvent);
-                    }
+                    cleanEvent();
                     window.removeEventListener("message", handleWindowEvent);
+                    return reject();
                 }
             }, 100);
 

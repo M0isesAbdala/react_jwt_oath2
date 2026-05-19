@@ -13,6 +13,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -40,6 +41,7 @@ import org.springframework.web.reactive.function.client.ExchangeFilterFunction;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.List;
+import java.util.Objects;
 
 @Configuration
 @EnableWebSecurity
@@ -50,6 +52,9 @@ public class SecurityConfig {
 
     @Autowired
     private OAuth2FailureHandler oAuth2FailureHandler;
+
+    @Autowired
+    Environment env;
 
     @Value("${server.servlet.session.cookie.name}")
     private String cookieName;
@@ -62,7 +67,7 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(
                         auth -> auth
-                                .requestMatchers(HttpMethod.GET, "/").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/redirect-logout").permitAll()
                                 .requestMatchers(HttpMethod.POST, "/login").permitAll()
                                 .anyRequest().authenticated()
                 )
@@ -89,9 +94,10 @@ public class SecurityConfig {
     @Bean
     @Order(Ordered.HIGHEST_PRECEDENCE)
     public CorsConfigurationSource corsConfigurationSource() {
+        String url = Objects.requireNonNull(env.getProperty("URL"));
         CorsConfiguration config = new CorsConfiguration();
 
-        config.setAllowedOrigins(List.of("http://localhost:8080", "http://localhost:5173"));
+        config.setAllowedOrigins(List.of(url));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);
@@ -109,8 +115,10 @@ public class SecurityConfig {
 
     @Bean
     public LogoutSuccessHandler oidcLogoutSuccessHandler(ClientRegistrationRepository clientRegistrationRepository) {
+        String url = Objects.requireNonNull(env.getProperty("URL"));
+        String context = Objects.requireNonNull(env.getProperty("CLIENT_NAME"));
         OidcClientInitiatedLogoutSuccessHandler handler = new OidcClientInitiatedLogoutSuccessHandler(clientRegistrationRepository);
-        handler.setPostLogoutRedirectUri("http://localhost:5173/client/");
+        handler.setPostLogoutRedirectUri(url + "/" + context + "/redirect-logout");
         return handler;
     }
 

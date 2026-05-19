@@ -7,10 +7,10 @@ logging:
     org.springframework.security.oauth2.client: ${DEBUG_LOG_LEVEL}
     org.springframework.security.oauth2.core.endpoint: ${DEBUG_LOG_LEVEL}
     org.springframework.security.oauth2.client.endpoint: ${DEBUG_LOG_LEVEL}
-#    com.netflix.eureka: ${DEBUG_LOG_LEVEL}
-#    com.netflix.discovery: ${DEBUG_LOG_LEVEL}
-#    org.springframework.cloud.netflix.eureka: ${DEBUG_LOG_LEVEL}
-#    com.netflix.discovery.shared.MonitoredConnectionManager: ${DEBUG_LOG_LEVEL}
+    com.netflix.eureka: ${DEBUG_LOG_LEVEL}
+    com.netflix.discovery: ${DEBUG_LOG_LEVEL}
+    org.springframework.cloud.netflix.eureka: ${DEBUG_LOG_LEVEL}
+    com.netflix.discovery.shared.MonitoredConnectionManager: ${DEBUG_LOG_LEVEL}
 server:
   forward-headers-strategy: native
   port: ${AUTHENTICATION_PORT}
@@ -21,6 +21,11 @@ server:
         path: /${AUTHENTICATION_NAME}
         name: AUTHSESSION
 spring:
+  devtools:
+    restart:
+      enabled: true
+      poll-interval: 2s
+      quiet-period: 1s
   security:
     oauth2:
       authorizationserver:

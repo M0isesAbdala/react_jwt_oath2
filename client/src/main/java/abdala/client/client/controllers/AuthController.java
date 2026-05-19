@@ -43,7 +43,7 @@ public class AuthController {
         this.authHost = env.getProperty("GATEWAY_URL") + ":" + env.getProperty("GATEWAY_PORT") + "/" + env.getProperty("AUTHENTICATION_NAME");
     }
 
-    @GetMapping("/")
+    @GetMapping("/redirect-logout")
     public String logout() {
         return """
                     <script>

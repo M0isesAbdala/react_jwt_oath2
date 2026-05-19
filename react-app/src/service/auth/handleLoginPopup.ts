@@ -29,6 +29,12 @@ export function handleLoginPopup(provider: string, cb: HandleCallbackPopup) {
         console.error("Popup bloqueado pelo navegador");
     } else {
 
+        function cleanEvent(): void {
+            if (closeEvent) {
+                clearInterval(closeEvent);
+            }
+        }
+
         function handleWindowEvent(event: MessageEvent<any>): void {
             if (event.origin !== window.location.origin) {
                 return;
@@ -38,13 +44,12 @@ export function handleLoginPopup(provider: string, cb: HandleCallbackPopup) {
                 cb({ type: 'ERROR', message: event.data.message });
             }
             window.removeEventListener("message", handleWindowEvent);
+            cleanEvent();
         }
 
         closeEvent = setInterval(() => {
             if (popup.closed) {
-                if (closeEvent) {
-                    clearInterval(closeEvent);
-                }
+                cleanEvent();
                 window.removeEventListener("message", handleWindowEvent);
             }
         }, 100);

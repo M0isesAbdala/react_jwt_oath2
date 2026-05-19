@@ -3,10 +3,12 @@ package abdala.resource.resource.config;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.security.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
+import org.springframework.core.env.Environment;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -24,11 +26,15 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import tools.jackson.databind.ObjectMapper;
 
 import java.util.List;
+import java.util.Objects;
 
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
 public class SecurityConfig {
+
+    @Autowired
+    Environment env;
 
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -66,6 +72,7 @@ public class SecurityConfig {
 
     @Bean
     public OpenAPI customOpenAPI() {
+        String url = Objects.requireNonNull(env.getProperty("URL"));
         return new OpenAPI()
                 .components(new Components()
                         .addSecuritySchemes("oauth2",
@@ -73,8 +80,8 @@ public class SecurityConfig {
                                         .type(SecurityScheme.Type.OAUTH2)
                                         .flows(new OAuthFlows()
                                                 .authorizationCode(new OAuthFlow()
-                                                        .authorizationUrl("http://localhost:9000/authentication/oauth2/authorize")
-                                                        .tokenUrl("http://localhost:9000/authentication/oauth2/token")
+                                                        .authorizationUrl(url + "/authentication/oauth2/authorize")
+                                                        .tokenUrl(url + "/authentication/oauth2/token")
                                                         .scopes(new Scopes()
                                                                 .addString("ADMIN", "Acesso administrativo")
                                                         )
@@ -87,9 +94,11 @@ public class SecurityConfig {
     @Bean
     @Order(Ordered.HIGHEST_PRECEDENCE)
     public CorsConfigurationSource corsConfigurationSource() {
+        String url = Objects.requireNonNull(env.getProperty("URL"));
+
         CorsConfiguration config = new CorsConfiguration();
 
-        config.setAllowedOrigins(List.of("http://localhost:8080"));
+        config.setAllowedOrigins(List.of(url));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);

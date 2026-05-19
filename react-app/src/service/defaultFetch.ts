@@ -1,4 +1,4 @@
-const DEFAULT_RESOURCE_URL: string = "http://localhost:5173/client";
+const DEFAULT_RESOURCE_URL: string = "http://mysite.com/client";
 
 type ContentType =
     | "application/json"

@@ -15,6 +15,22 @@ services:
 
     networks:
       - default_network
+  frontend:
+    build: ./react-app/
+    container_name: frontend
+
+    volumes:
+      # Bind mount only the src folder
+      - ./react-app/src:/app/src
+
+    ports:
+      - "5173:5173"
+      
+    environment:
+      CHOKIDAR_USEPOLLING: "true"
+
+    networks:
+      - default_network
   nginx:
     build: ./nginx/
     container_name: nginx
@@ -107,8 +123,6 @@ services:
 volumes:
   mysql_data:
     name: mysql_data
-  front_end:
-    name: front_end
 
 networks:
   default_network:

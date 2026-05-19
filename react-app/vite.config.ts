@@ -5,9 +5,9 @@ import babel from '@rolldown/plugin-babel'
 // https://vite.dev/config/
 export default defineConfig({
   server: {
-    proxy: {
-      '/client': 'http://mysite.com'
-    }
+    allowedHosts: [
+      'mysite.com'
+    ]
   },
   plugins: [
     react(),

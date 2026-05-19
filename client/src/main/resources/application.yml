@@ -13,7 +13,7 @@ logging:
     com.netflix.discovery.shared.MonitoredConnectionManager: ${DEBUG_LOG_LEVEL}
 server:
   port: ${CLIENT_PORT}
-  forward-headers-strategy: framework
+  forward-headers-strategy: native
   servlet:
     context-path: /${CLIENT_NAME}
     session:

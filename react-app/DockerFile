@@ -1,0 +1,15 @@
+FROM oven/bun:1 AS builder
+
+WORKDIR /app
+
+COPY package.json bun.lockb* ./
+
+RUN bun install
+RUN bun install -g vite
+RUN bun install -g typescript
+
+COPY . .
+
+EXPOSE 5173
+
+CMD ["bun", "run", "dev", "--host", "0.0.0.0"]

@@ -8,6 +8,8 @@ Set the host mysite.com on your machine. Ex: `127.0.0.1 mysite.com`
 `Command to run: docker compose up`
 \
 User: email - admin@example.com password - 12345
+\
+**Postman collection** in archives.
 
 ###
 

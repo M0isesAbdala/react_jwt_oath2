@@ -44,7 +44,7 @@ User: email - admin@example.com password - 12345
 
 - **Stack:** Spring Boot
 - **Service Name:** `resource`
-- **Responsibility:** —
+- **Responsibility:** Provides the controllers and services to manipulate the application's entities.
 
 ---
 

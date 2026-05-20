@@ -1,10 +1,13 @@
 <h1 align="left">React Spring JWT Oath2</h1>
 
 ###
-<p align="left">Set the host mysite.com on your machine. Ex: 127.0.0.1 mysite.com</p>
-<p align="left">Services are sensitive to file changes. Java projects need an IDE with an autocompiler for Spring DevTools to capture changes.</p>
-<p align="left">Command to run: docker compose up</p>
-<p align="left">User: email - admin@example.com password - 12345 </p>
+Set the host mysite.com on your machine. Ex: `127.0.0.1 mysite.com`
+</br>
+**Services are sensitive to file changes.** Java projects need an IDE with an autocompiler for Spring DevTools to capture changes.
+</br>
+`Command to run: docker compose up`
+</br>
+User: email - admin@example.com password - 12345
 
 ###
 
